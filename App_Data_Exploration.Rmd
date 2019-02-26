@@ -1,0 +1,36 @@
+---
+title: "ESM 244 App Data Exploration"
+author: "Meghan Cook"
+date: "2/26/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Load Data & Packages
+```{r}
+
+library(tidyverse)
+library(readr)
+
+df <- read_csv("~/Desktop/independent-election-expenditures/2016.csv")
+
+```
+
+```{r}
+
+table(df$can_nam)
+
+#df[agrep("linton", df)] <- "Clinton"
+
+#str_replace()
+
+#table(df$can_nam)
+
+```
+
+candidate names are inconsistent, have commas
+some election type labels don't have a key
+money donated needs to be turned to numeric
