@@ -14,23 +14,98 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(readr)
+library(RColorBrewer)
 
-df <- read_csv("~/Desktop/independent-election-expenditures/2016.csv")
+df <- read_csv("2016_pres.csv")
+
+```
+
+#histograms of support donations to each
+```{r}
+
+df_pro_hil <- df %>% 
+  filter(can_nam == "Clinton") %>%
+  filter(sup_opp == "Support")
+
+hist(df_pro_hil$exp_amo)
+  
+df_pro_tru <- df %>% 
+  filter(can_nam == "Trump") %>%
+  filter(sup_opp == "Support")
+
+hist(df_pro_tru$exp_amo)
 
 ```
 
 ```{r}
 
-table(df$can_nam)
+df_hil <- df %>% 
+  filter(can_nam == "Clinton")
 
-#df[agrep("linton", df)] <- "Clinton"
+ggplot(data=df_hil, aes(x=spe_nam, y=exp_amo, color=sup_opp)) +
+  geom_bar(stat='identity') +
+  theme_minimal()
 
-#str_replace()
+exp_sum <- df %>% 
+  group_by(can_nam, sup_opp, spe_nam) %>% 
+  summarise(sum_exp = sum(exp_amo))
 
-#table(df$can_nam)
-
+ggplot(data=exp_sum, aes(x=spe_nam, y=sum_exp, fill=sup_opp)) +
+  geom_bar(stat='identity') +
+  theme_minimal()
 ```
 
-candidate names are inconsistent, have commas
-some election type labels don't have a key
-money donated needs to be turned to numeric
+```{r}
+
+exp_hil_sup <- exp_sum %>% 
+  filter(can_nam == "Clinton") %>% 
+  filter(sup_opp == "Support") %>% 
+  arrange(desc(sum_exp))
+
+exp_hil_opp <- exp_sum %>% 
+  filter(can_nam == "Clinton") %>% 
+  filter(sup_opp == "Oppose") %>% 
+  arrange(desc(sum_exp))
+
+exp_tru_sup <- exp_sum %>% 
+  filter(can_nam == "Trump") %>% 
+  filter(sup_opp == "Support") %>% 
+  arrange(desc(sum_exp))
+
+exp_tru_opp <- exp_sum %>% 
+  filter(can_nam == "Trump") %>% 
+  filter(sup_opp == "Oppose") %>% 
+  arrange(desc(sum_exp)) %>% 
+  slice(1:10)
+
+par(mfrow = c(2,2))
+hist(exp_hil_sup$sum_exp)
+hist(exp_hil_opp$sum_exp)
+hist(exp_tru_sup$sum_exp)
+hist(exp_tru_opp$sum_exp)
+  
+```
+
+```{r}
+
+hil_sup_t10 <- exp_hil_sup %>%
+  slice(1:10)
+  
+hil_opp_t10 <- exp_hil_opp %>%
+  slice(1:10)
+
+tru_sup_t10 <- exp_tru_sup %>%
+  slice(1:10)
+  
+tru_opp_t10 <- exp_tru_opp %>%
+  slice(1:10)
+
+ggplot(data=hil_sup_t10, aes(x=spe_nam, y=sum_exp, fill=spe_nam)) +
+  geom_bar(stat='identity') +
+  theme_classic() +
+  ggtitle("10 Largest Donors in Support of Clinton") +
+  xlab("Donor Name") +
+  ylab("Total Amount Donated (USD)")
+  
+```
+
