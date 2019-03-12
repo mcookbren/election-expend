@@ -109,3 +109,27 @@ ggplot(data=hil_sup_t10, aes(x=spe_nam, y=sum_exp, fill=spe_nam)) +
   
 ```
 
+```{r}
+
+con_df <- read_csv("2016_congr.csv")
+
+contab_df <- con_df %>% 
+  filter(can_off != "P")
+
+#contab_df$can_par_aff[which(contab_df$can_par_aff == "NA")] 
+
+c_exp_sum <- contab_df %>% 
+  group_by(can_off,can_off_sta,can_par_aff,can_nam, spe_nam, sup_opp) %>% 
+  summarise(sum_exp = sum(exp_amo))
+
+senate_df <- con_df %>% 
+  filter(can_off != "P") %>% 
+  filter(can_off != "H")
+
+sen_top_donor <- senate_df %>% 
+  group_by(spe_nam, can_off_sta, can_par_aff, sup_opp) %>% 
+  summarise(sum_exp = sum(exp_amo)) %>% 
+  arrange(desc(sum_exp))
+
+```
+
