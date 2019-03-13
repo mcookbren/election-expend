@@ -1,14 +1,28 @@
 #ESM 244 Shiny App
 #By: Meghan Cook
 #2016 Election Expenditure
-#Data Source: Federal Election Commission
+#Data Source: U.S. Federal Election Commission
 
 library(shiny)
 library(RColorBrewer)
+library(tidyverse)
+library(readr)
+
+df <- read_csv("2016_pres.csv")
+
+exp_sum <- df %>% 
+  group_by(can_nam, sup_opp, spe_nam) %>% 
+  summarise(sum_exp = sum(exp_amo))
+
+con_df <- read_csv("2016_congr.csv")
+
+contab_df <- con_df %>% 
+  filter(can_off != "P")
 
 # Define UI for application
-ui <- navbarPage("2016 Election Expenditures",
-                 tabPanel("Presidential Election"),
+ui <- navbarPage("Independent Expenditures in the 2016 Election",
+                 tabPanel("Presidential Election",
+                 titlePanel("Top Donor For or Against a Presidential Candidate"),
                  sidebarLayout(
                    sidebarPanel(
                      
@@ -31,9 +45,11 @@ ui <- navbarPage("2016 Election Expenditures",
                      
                    )
                      
-                 ), #close sidebarLayout
+                 ) #close sidebarLayout
+), #closes tabPanel
                  
-                 tabPanel("Congressional Elections"),
+                 tabPanel("Congressional Elections",
+                 titlePanel("Top Donors For or Against Congressional Candidates"),
                  sidebarLayout(
                    sidebarPanel(
                      
@@ -42,34 +58,28 @@ ui <- navbarPage("2016 Election Expenditures",
                                  "Select Election Office:", 
                                  choices = c(S ="Senate", H = "House")
                      ),
-                     
                      #input state
                      selectInput("state",
                                  "Select Election State:",
-                                 choices = can_off_sta,
-                                 selectize = TRUE
+                                 choices = (con_df$can_off_sta)
                      ),
-                     
                      #input party
                      selectInput("party", 
                                  "Select Candidate Party Affiliation:", 
-                                 choices = can_par_aff
+                                 choices = (con_df$can_par_aff)
                      ),
-                     
                      #input candidate name
                      selectInput("c_candidate", 
                                  "Select Candidate Name:", 
-                                 choices = can_nam
+                                 choices = (con_df$can_nam)
                      ),
-                     
                      #input donation was to support or oppose
                      radioButtons("c_support", 
                                  "Was Donation to Support or Oppose?", 
                                  choices = c(Support ="Support", Oppose = "Oppose") 
                      )            
                      
-                   )#close sidebar panel
-                 ),
+                 ), #close sidebarPanel
                  
                  mainPanel(
                    
@@ -78,7 +88,10 @@ ui <- navbarPage("2016 Election Expenditures",
                  )
                  
                  
-                 )
+                 ) #close sidebarLayout
+  ) #closes tabPanel
+) #closes NavbarPage
+
 
 
 # Define server logic required to draw barplots
@@ -111,7 +124,7 @@ server <- function(input, output) {
      
      #filter by office, state, party, candidate, and if donation was to support or oppose
      #Show only 10 largest donors for a candidate
-     cexp_sum_t10 <- con_df %>% 
+     cexp_sum_t10 <- contab_df %>% 
        filter(can_off == input$election) %>%
        filter(can_off_sta == input$state) %>% 
        filter(can_par_aff == input$party) %>% 
