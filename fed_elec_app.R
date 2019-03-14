@@ -56,17 +56,17 @@ ui <- navbarPage("Independent Expenditures in the 2016 Election",
                      #input election office (house or senate)
                      radioButtons("election", 
                                  "Select Election Office:", 
-                                 choices = c(S ="Senate", H = "House")
+                                 choices = c(Senate ="S", House = "H")
                      ),
                      #input state
                      selectInput("state",
                                  "Select Election State:",
-                                 choices = (con_df$can_off_sta)
+                                 choices = c(CA = "CA",AZ = "AZ")
                      ),
                      #input party
                      selectInput("party", 
                                  "Select Candidate Party Affiliation:", 
-                                 choices = (con_df$can_par_aff)
+                                 choices = c(Democrat ="Dem", Republican ="Rep")
                      ),
                      #input candidate name
                      selectInput("c_candidate", 
